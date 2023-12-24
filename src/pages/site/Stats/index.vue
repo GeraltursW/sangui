@@ -1,34 +1,146 @@
 <template>
 	<div class="wrapper">
-		<div class="container">
-			<div class="top-banner">
-				<div class="radar-chart">
-					<v-chart class="chart" :option="option2"></v-chart>
-				</div>
+		<div class="left-elements">
+			<div class="cus-button" @click="setTarget">设置总数</div>
+			<div class="cus-button" @click="setParams">设置参数</div>
 
-				<div class="top-banner-content">
-					<button id="bottone5" @click="setTarget">设置总数</button>
-					<h3>目标:{{ target }}</h3>
-					<h3>当前总数:{{ finalPoints }}</h3>
-				</div>
-			</div>
-
-
-
-			<div class="banner">
-				<div v-for="item in roleList" :key="item.id" class="element">
-					<p>{{ item.roleName }}</p>
-					<a :href="item.linkUrl" target="_blank">
-						<img :src="item.imgUrl" class="logo">
-					</a>
-					<el-button type="primary" @click="handleModal(item.id)" plain>进入计算</el-button>
-				</div>
+			<div class="card">
+				<p class="heading">
+					目标:{{ target }}
+				</p>
+				<p>
+					当前总数
+				</p>
+				<p>{{ finalPoints }}</p>
 			</div>
 		</div>
-		<!-- <div class="line-chart" style="margin-top: 20px;">
-			<v-chart class="chart" :option="option" />
-		</div> -->
-		<el-dialog v-model="targetVisible" title="设置目标" destroy-on-close>
+		<div class="mid-elements">
+
+		</div>
+
+
+		<div class="right-elements">
+			<el-card class="box-card">
+				<el-form :model="form" label-width="120px">
+					<el-row>
+						<el-col :span="18">
+							<label class="switch">
+								<input checked="" type="checkbox" class="toggle" v-model="form.win">
+								<span class="slider"></span>
+								<span class="card-side"></span>
+							</label>
+						</el-col>
+
+
+						<el-col :span="6">
+							<div style="display: flex;">
+								<p style="font-size: 20px;">总点数:
+								</p>
+								<p :class="{ 'black-text': calculateTotalPoints > 0, 'red-text': calculateTotalPoints < 0 }"
+									style="font-size: 20px;margin-left: 10px;">
+									{{ calculateTotalPoints }}</p>
+							</div>
+
+
+						</el-col>
+					</el-row>
+
+					<el-row style="margin-top: 10px;">
+						<el-col :span="12">
+							<el-form-item label="击杀数">
+								<el-input-number v-model="form.kill" :min="0" :max="100" />
+							</el-form-item>
+						</el-col>
+						<el-col :span="12">
+							<el-form-item label="单杀数">
+								<el-input-number v-model="form.soloKill" :min="0" :max="100" />
+							</el-form-item>
+						</el-col>
+					</el-row>
+					<el-row>
+						<el-col :span="12">
+							<el-form-item label="死亡数">
+								<el-input-number v-model="form.death" :min="0" :max="100" />
+							</el-form-item>
+						</el-col>
+						<el-col :span="12">
+							<el-form-item label="被单杀数">
+								<el-input-number v-model="form.soloDeath" :min="0" :max="100" />
+							</el-form-item>
+						</el-col>
+					</el-row>
+					<el-row>
+						<el-col :span="12">
+							<el-form-item label="MVP">
+								<el-switch v-model="form.mvp" />
+							</el-form-item>
+						</el-col>
+						<el-col :span="12">
+							<el-form-item label="对位MVP">
+								<el-switch v-model="form.compMvp" />
+							</el-form-item>
+						</el-col>
+					</el-row>
+					<el-row>
+						<el-col :span="12">
+							<el-form-item label="超神">
+								<el-switch v-model="form.godlike" />
+							</el-form-item>
+						</el-col>
+						<el-col :span="12">
+							<el-form-item label="对位超神">
+								<el-switch v-model="form.compGodlike" />
+							</el-form-item>
+						</el-col>
+					</el-row>
+					<el-row>
+						<el-col :span="12">
+							<el-form-item label="超鬼">
+								<el-switch v-model="form.ghostlike" />
+							</el-form-item>
+						</el-col>
+						<el-col :span="12">
+							<el-form-item label="评分最低">
+								<el-switch v-model="form.lowest" />
+							</el-form-item>
+						</el-col>
+					</el-row>
+					<el-row>
+						<el-col :span="12">
+							<el-form-item label="四杀次数">
+								<el-input-number v-model="form.quadr" :min="0" :max="100" />
+							</el-form-item>
+						</el-col>
+						<el-col :span="12">
+							<el-form-item label="五杀次数">
+								<el-input-number v-model="form.penta" :min="0" :max="100" />
+							</el-form-item>
+						</el-col>
+					</el-row>
+					<el-row>
+						<el-col :span="12">
+							<el-form-item label="对位四杀">
+								<el-input-number v-model="form.compQuadr" :min="0" :max="100" />
+							</el-form-item>
+						</el-col>
+						<el-col :span="12">
+							<el-form-item label="对位五杀">
+								<el-input-number v-model="form.compPenta" :min="0" :max="100" />
+							</el-form-item>
+						</el-col>
+					</el-row>
+
+					<div class="form-btn">
+
+						<el-button type="primary" @click="confirmEvent">确定</el-button>
+						<el-button type="info" @click="reset">重置</el-button>
+					</div>
+
+				</el-form>
+			</el-card>
+		</div>
+
+		<el-dialog v-model="targetVisible" title="设置目标" destroy-on-close width="400px">
 			<el-form :model="form2" label-width="120px">
 				<el-row style="margin-top: 10px;">
 					<el-col :span="24">
@@ -46,123 +158,108 @@
 
 			</el-form>
 		</el-dialog>
-		<el-dialog v-model="dialogVisible" title="园长数据统计" destroy-on-close>
+		<el-dialog v-model="paramsVisible" title="设置目标" destroy-on-close>
 			<el-form :model="form" label-width="120px">
-				<el-row>
-					<el-col :span="18">
-						<label class="switch">
-							<input checked="" type="checkbox" class="toggle" v-model="form.win">
-							<span class="slider"></span>
-							<span class="card-side"></span>
-						</label>
-					</el-col>
-
-
-					<el-col :span="6">
-						<div style="display: flex;">
-							<p style="font-size: 20px;">总点数:
-							</p>
-							<p :class="{ 'black-text': calculateTotalPoints > 0, 'red-text': calculateTotalPoints < 0 }"
-								style="font-size: 20px;margin-left: 10px;">
-								{{ calculateTotalPoints }}</p>
-						</div>
-
-
-					</el-col>
-				</el-row>
-
 				<el-row style="margin-top: 10px;">
 					<el-col :span="12">
-						<el-form-item label="击杀数">
-							<el-input-number v-model="form.kill" :min="0" :max="100" />
-
+						<el-form-item label="赢">
+							<el-input-number v-model="paramsList.win" :min="0" :max="99999" />
 						</el-form-item>
 					</el-col>
 					<el-col :span="12">
-						<el-form-item label="单杀数">
-							<el-input-number v-model="form.soloKill" :min="0" :max="100" />
+						<el-form-item label="输">
+							<el-input-number v-model="paramsList.lose" :min="0" :max="99999" />
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row style="margin-top: 10px;">
+					<el-col :span="12">
+						<el-form-item label="击杀">
+							<el-input-number v-model="paramsList.kill" :min="0" :max="99999" />
+						</el-form-item>
+					</el-col>
+					<el-col :span="12">
+						<el-form-item label="单杀">
+							<el-input-number v-model="paramsList.soloKill" :min="0" :max="99999" />
 						</el-form-item>
 					</el-col>
 				</el-row>
 				<el-row>
 					<el-col :span="12">
-						<el-form-item label="死亡数">
-							<el-input-number v-model="form.death" :min="0" :max="100" />
+						<el-form-item label="死亡">
+							<el-input-number v-model="paramsList.death" :min="0" :max="99999" />
 						</el-form-item>
 					</el-col>
 					<el-col :span="12">
-						<el-form-item label="被单杀数">
-							<el-input-number v-model="form.soloDeath" :min="0" :max="100" />
+						<el-form-item label="被单杀">
+							<el-input-number v-model="paramsList.soloDeath" :min="0" :max="99999" />
 						</el-form-item>
 					</el-col>
 				</el-row>
 				<el-row>
 					<el-col :span="12">
 						<el-form-item label="MVP">
-							<el-switch v-model="form.mvp" />
+							<el-input-number v-model="paramsList.mvp" :min="0" :max="99999" />
 						</el-form-item>
 					</el-col>
 					<el-col :span="12">
 						<el-form-item label="对位MVP">
-							<el-switch v-model="form.compMvp" />
+							<el-input-number v-model="paramsList.compMvp" :min="0" :max="99999" />
 						</el-form-item>
 					</el-col>
 				</el-row>
 				<el-row>
 					<el-col :span="12">
 						<el-form-item label="超神">
-							<el-switch v-model="form.godlike" />
+							<el-input-number v-model="paramsList.godlike" :min="0" :max="99999" />
 						</el-form-item>
 					</el-col>
 					<el-col :span="12">
 						<el-form-item label="对位超神">
-							<el-switch v-model="form.compGodlike" />
+							<el-input-number v-model="paramsList.compGodlike" :min="0" :max="99999" />
 						</el-form-item>
 					</el-col>
 				</el-row>
 				<el-row>
 					<el-col :span="12">
 						<el-form-item label="超鬼">
-							<el-switch v-model="form.ghostlike" />
+							<el-input-number v-model="paramsList.ghostlike" :min="0" :max="99999" />
 						</el-form-item>
 					</el-col>
 					<el-col :span="12">
 						<el-form-item label="评分最低">
-							<el-switch v-model="form.lowest" />
+							<el-input-number v-model="paramsList.lowest" :min="0" :max="99999" />
 						</el-form-item>
 					</el-col>
 				</el-row>
 				<el-row>
 					<el-col :span="12">
-						<el-form-item label="四杀次数">
-							<el-input-number v-model="form.quadr" :min="0" :max="100" />
+						<el-form-item label="四杀">
+							<el-input-number v-model="paramsList.quadr" :min="0" :max="100" />
 						</el-form-item>
 					</el-col>
 					<el-col :span="12">
-						<el-form-item label="五杀次数">
-							<el-input-number v-model="form.penta" :min="0" :max="100" />
+						<el-form-item label="五杀">
+							<el-input-number v-model="paramsList.penta" :min="0" :max="100" />
 						</el-form-item>
 					</el-col>
 				</el-row>
 				<el-row>
 					<el-col :span="12">
 						<el-form-item label="对位四杀">
-							<el-input-number v-model="form.compQuadr" :min="0" :max="100" />
+							<el-input-number v-model="paramsList.compQuadr" :min="0" :max="100" />
 						</el-form-item>
 					</el-col>
 					<el-col :span="12">
 						<el-form-item label="对位五杀">
-							<el-input-number v-model="form.compPenta" :min="0" :max="100" />
+							<el-input-number v-model="paramsList.compPenta" :min="0" :max="100" />
 						</el-form-item>
 					</el-col>
 				</el-row>
-
 				<div class="form-btn">
-					
-					<el-button type="primary" @click="confirmEvent">确定</el-button>
-					<el-button type="info" @click="reset">重置</el-button>
+					<el-button type="primary" @click="confirmParams">确定</el-button>
+					<el-button type="info" @click="resetParams">重置</el-button>
 				</div>
-
 			</el-form>
 		</el-dialog>
 	</div>
@@ -171,37 +268,45 @@
 <script  setup lang="ts">
 import { ref, provide, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import { use } from "echarts/core";
-import { CanvasRenderer } from "echarts/renderers";
-import { LineChart, RadarChart } from "echarts/charts";
-import {
-	GridComponent,
-	TitleComponent,
-	TooltipComponent,
-	LegendComponent
-} from "echarts/components";
-import VChart, { THEME_KEY } from "vue-echarts";
 import { roleList } from './stats.data'
+import './style.less'
 
-
-use([
-	CanvasRenderer,
-	RadarChart,
-	LineChart,
-	TitleComponent,
-	TooltipComponent,
-	LegendComponent,
-	GridComponent
-]);
-
-provide(THEME_KEY, "light");
-//弹窗显示
-const dialogVisible = ref<Boolean>(false)
 //目标弹窗
 const targetVisible = ref<Boolean>(false)
+//参数弹窗
+const paramsVisible = ref<Boolean>(false)
+//控制弹窗显示
+function setTarget() {
+	targetVisible.value = true
+}
+
+
+function setParams() {
+	paramsVisible.value = true
+}
+
 //目标内容
 const form2 = ref({
 	target: ""
+})
+//参数内容
+const paramsList = ref({
+	win: 0,
+	lose: 0,
+	kill: 0,
+	soloKill: 0,
+	death: 0,
+	soloDeath: 0,
+	godlike: 0,
+	compGodlike: 0,
+	ghostlike: 0,
+	lowest: 0,
+	mvp: 0,
+	compMvp: 0,
+	quadr: 0,
+	penta: 0,
+	compQuadr: 0,
+	compPenta: 0,
 })
 //表单内容
 const form = ref({
@@ -224,21 +329,22 @@ const form = ref({
 
 
 const pointRules = ref({
-	win: 5,
-	kill: 1,
-	soloKill: 5,
-	death: -3,
-	soloDeath: -5,
-	godlike: 20,
-	compGodlike: -20,
-	ghostlike: -20,
-	lowest: -40,
-	mvp: 2,
-	compMvp: -20,
-	quadr: 40,
-	penta: 100,
-	compQuadr: -40,
-	compPenta: -100,
+	win: 0,
+	lose: 0,
+	kill: 0,
+	soloKill: 0,
+	death: 0,
+	soloDeath: 0,
+	godlike: 0,
+	compGodlike: 0,
+	ghostlike: 0,
+	lowest: 0,
+	mvp: 0,
+	compMvp: 0,
+	quadr: 0,
+	penta: 0,
+	compQuadr: 0,
+	compPenta: 0,
 });
 //总得分计算属性
 const calculateTotalPoints = computed(() => {
@@ -253,7 +359,7 @@ const calculateTotalPoints = computed(() => {
 	totalPoints += form.value.penta * pointRules.value.penta;
 
 	// Add points for godlike, compGodlike, mvp, compMvp (maximum once)
-	totalPoints += form.value.win ? pointRules.value.win : -20;
+	totalPoints += form.value.win ? pointRules.value.win : pointRules.value.lose;
 	totalPoints += form.value.godlike ? pointRules.value.godlike : 0;
 	totalPoints += form.value.compGodlike ? pointRules.value.compGodlike : 0;
 	totalPoints += form.value.mvp ? pointRules.value.mvp : 0;
@@ -265,7 +371,6 @@ const calculateTotalPoints = computed(() => {
 
 	return totalPoints;
 });
-
 //目标数
 const target = ref()
 //已经获得的数量
@@ -273,9 +378,7 @@ const finalPoints = ref()
 finalPoints.value = localStorage.getItem('finalPoints')
 //从本地存储拿
 target.value = localStorage.getItem('target')
-function setTarget() {
-	targetVisible.value = true
-}
+
 
 //确定目标总数
 function targetConfirm() {
@@ -288,116 +391,8 @@ function targetConfirm() {
 	console.log(target.value);
 }
 
-watch(finalPoints, (newVal, oldVal) => {
-
-})
-
-const option = ref({
-	title: {
-		text: '最近走势',
-		left: 'center'
-	},
-	tooltip: {
-		trigger: 'item',
-		formatter: '{a} <br/>{b} : {c}'
-	},
-	legend: {
-		left: 'left'
-	},
-	xAxis: {
-		type: 'category',
-		name: 'x',
-		splitLine: { show: false },
-		data: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
-	},
-	grid: {
-		left: '3%',
-		right: '4%',
-		bottom: '3%',
-		containLabel: true
-	},
-	yAxis: {
-		type: 'log',
-		name: 'y',
-		minorSplitLine: {
-			show: true
-		}
-	},
-	series: [
-		{
-			name: '芜湖神',
-			type: 'line',
-			data: [1, 3, 9, 27, 81, 247, 741, 2223, 6669]
-		},
-		{
-			name: '彩旗',
-			type: 'line',
-			data: [1, 2, 0.3, 8, 16, 32, 64, 128, 256]
-		},
-		{
-			name: '公公',
-			type: 'line',
-			data: [
-				1 / 2,
-				1 / 4,
-				1 / 8,
-				1 / 16,
-				1 / 32,
-				1 / 64,
-				1 / 128,
-				1 / 256,
-				1 / 512
-			]
-		}
-	]
-});
-
-const option2 = ref({
-	title: {
-		text: '三人雷达图'
-	},
-	legend: {
-		data: ['芜湖神', '古手羽', '彩旗']
-	},
-	radar: {
-		// shape: 'circle',
-		indicator: [
-			{ name: '场均击杀', max: 30 },
-			{ name: '五杀', max: 3 },
-			{ name: '场均单杀', max: 20 },
-			{ name: '场均死亡', max: 20 },
-			{ name: '四杀', max: 3 },
-			{ name: 'mvp率', max: 1 },
-		]
-	},
-	series: [
-		{
-			name: 'Budget vs spending',
-			type: 'radar',
-			data: [
-				{
-					value: [11, 1, 3, 5, 1, 0.2],
-					name: '芜湖神'
-				},
-				{
-					value: [20, 2, 10, 3, 2, 0.8],
-					name: '古手羽'
-				},
-				{
-					value: [25, 3, 15, 2, 3, 0.9],
-					name: '彩旗'
-				}
-			]
-		}
-	]
-})
 
 
-function handleModal() {
-	init()
-	calculateTotalPoints.value = 0
-	dialogVisible.value = true
-}
 const reset = () => {
 	init()
 }
@@ -410,6 +405,22 @@ function confirmEvent() {
 		message: '获得' + calculateTotalPoints.value + '点积分',
 		type: 'success',
 	})
+}
+
+//确定参数的值
+function confirmParams() {
+	// 循环存储数据到localStorage
+	Object.keys(paramsList.value).forEach(key => {
+		localStorage.setItem(key, paramsList.value[key]);
+	});
+	// 循环从localStorage中读取数据并赋值给pointRules
+	Object.keys(pointRules.value).forEach(key => {
+		const storedValue = localStorage.getItem(key);
+		if (storedValue !== null) {
+			pointRules.value[key] = parseInt(storedValue, 10);
+		}
+	});
+	paramsVisible.value = false
 }
 //初始化form的值
 function init() {
@@ -431,34 +442,29 @@ function init() {
 }
 </script>
 <style lang="less" scoped >
+//整体样式布局
 .wrapper {
-	.container {
+	position: relative;
+	display: flex;
+	gap: 2rem;
+	top: 200px;
+	padding: 0 1.5em;
+
+	.left-elements {
 		display: flex;
 		flex-direction: column;
-
-		.banner {
-			display: flex;
-			justify-content: space-between;
-
-			.element {
-				height: 100%;
-				padding: .2em .5em;
-				display: flex;
-				flex-direction: column;
-				gap: 1.5rem;
-
-				p {
-					padding: 0 1.5rem;
-					font-size: 20px;
-					font-weight: bold;
-					color: #0D2F3F;
-				}
-			}
-		}
-
+		gap: 1.5rem;
+		// margin-left: 40px;
+		flex: 1;
 	}
 
+	.mid-elements {
+		flex: 1;
+	}
 
+	.right-elements {
+		flex: 4;
+	}
 }
 
 
@@ -531,21 +537,6 @@ function init() {
 	transform: translateX(32px);
 }
 
-.logo {
-	width: 10em;
-	height: 10em;
-	padding: 1.5rem;
-	will-change: filter;
-	transition: filter 300ms;
-}
-
-.logo:hover {
-	filter: drop-shadow(0 0 2em #646cffaa);
-}
-
-.logo.vue:hover {
-	filter: drop-shadow(0 0 2em #df51bbaa);
-}
 
 
 .form-btn {
@@ -563,68 +554,9 @@ function init() {
 }
 
 
-.top-banner {
-	display: flex;
-	justify-content: space-evenly;
 
-	.radar-chart {
-		width: 80vw;
-	}
-
-	.top-banner-content {
-		display: flex;
-		flex-direction: column;
-		gap: 1.2rem;
-		padding: 1.5em .2em;
-	}
-}
 
 .chart {
 	height: 61vh;
-}
-
-#bottone5 {
-	align-items: center;
-	background-color: #FFFFFF;
-	border: 1px solid rgba(0, 0, 0, 0.1);
-	border-radius: .25rem;
-	box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
-	box-sizing: border-box;
-	color: rgba(0, 0, 0, 0.85);
-	cursor: pointer;
-	display: inline-flex;
-	font-family: system-ui, -apple-system, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
-	font-size: 16px;
-	font-weight: 600;
-	justify-content: center;
-	line-height: 1.25;
-	min-height: 3rem;
-	padding: calc(.875rem - 1px) calc(1.5rem - 1px);
-	text-decoration: none;
-	transition: all 250ms;
-	user-select: none;
-	-webkit-user-select: none;
-	touch-action: manipulation;
-	vertical-align: baseline;
-	width: auto;
-}
-
-#bottone5:hover,
-#bottone5:focus {
-	border-color: rgba(0, 0, 0, 0.15);
-	box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
-	color: rgba(0, 0, 0, 0.65);
-}
-
-#bottone5:hover {
-	transform: translateY(-1px);
-}
-
-#bottone5:active {
-	background-color: #F0F0F1;
-	border-color: rgba(0, 0, 0, 0.15);
-	box-shadow: rgba(0, 0, 0, 0.06) 0 2px 4px;
-	color: rgba(0, 0, 0, 0.65);
-	transform: translateY(0);
 }
 </style>
