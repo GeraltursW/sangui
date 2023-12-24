@@ -410,7 +410,12 @@ function confirmEvent() {
 function confirmParams() {
 	// 循环存储数据到localStorage
 	Object.keys(paramsList.value).forEach(key => {
-		localStorage.setItem(key, paramsList.value[key]);
+		const storedValue = localStorage.getItem(key);
+		const currentValue = pointRules.value[key];
+		if (currentValue !== storedValue) {
+			localStorage.setItem(key, paramsList.value[key]);
+		}
+
 	});
 	// 循环从localStorage中读取数据并赋值给pointRules
 	Object.keys(pointRules.value).forEach(key => {
@@ -421,6 +426,8 @@ function confirmParams() {
 	});
 	paramsVisible.value = false
 }
+
+
 //初始化form的值
 function init() {
 	form.value = {
@@ -440,7 +447,13 @@ function init() {
 	}
 }
 
-//参数初始化
+Object.keys(pointRules.value).forEach(key => {
+	const storedValue = localStorage.getItem(key);
+	if (storedValue !== null) {
+		pointRules.value[key] = parseInt(storedValue, 10);
+	}
+});
+
 </script>
 <style lang="less" scoped >
 //整体样式布局
